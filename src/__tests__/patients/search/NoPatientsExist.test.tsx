@@ -1,5 +1,3 @@
-import { Icon, Typography, Button } from '@hospitalrun/components'
-import { mount } from 'enzyme'
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 
