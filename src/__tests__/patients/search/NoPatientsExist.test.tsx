@@ -9,7 +9,7 @@ describe('NoPatientsExist', () => {
   it('should render an icon and a button with typography', () => {
     setup()
 
-    expect(screen.getByRole('heading')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /patients.noPatients/i })).toBeInTheDocument()
     expect(screen.getByText('patients.noPatients')).toBeInTheDocument()
 
     expect(screen.getByRole('button')).toBeInTheDocument()
