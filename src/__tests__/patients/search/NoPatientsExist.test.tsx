@@ -11,6 +11,7 @@ describe('NoPatientsExist', () => {
 
     expect(screen.getByRole('heading')).toBeInTheDocument()
     expect(screen.getByText('patients.noPatients')).toBeInTheDocument()
+
     expect(screen.getByRole('button')).toBeInTheDocument()
     expect(screen.getByText('patients.newPatient')).toBeInTheDocument()
   })
