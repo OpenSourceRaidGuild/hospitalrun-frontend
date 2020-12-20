@@ -15,7 +15,8 @@ const mockStore = configureStore(middlewares)
 describe('Patients', () => {
   const render = () => {
     const store = mockStore({})
-    const result = rtlRender(
+
+    return rtlRender(
       <Provider store={store}>
         <MemoryRouter>
           <TitleProvider>
@@ -24,8 +25,6 @@ describe('Patients', () => {
         </MemoryRouter>
       </Provider>,
     )
-
-    return result
   }
 
   beforeEach(() => {
