@@ -22,19 +22,20 @@ describe('Add Care Plan Modal', () => {
     carePlans: [] as CarePlan[],
   } as Patient
 
-  const onCloseSpy = jest.fn()
   const setup = () => {
+    const onCloseSpy = jest.fn()
     jest.spyOn(PatientRepository, 'find').mockResolvedValue(patient)
     jest.spyOn(PatientRepository, 'saveOrUpdate')
     const history = createMemoryHistory()
     // eslint-disable-next-line react/prop-types
-    const Wrapper: React.FC = ({ children }) => <Router history={history}>{children}</Router>
-
-    const result = render(
-      <AddCarePlanModal patient={patient} show onCloseButtonClick={onCloseSpy} />,
-      { wrapper: Wrapper },
-    )
-    return result
+    return {
+      ...render(
+        <Router history={history}>
+          <AddCarePlanModal patient={patient} show onCloseButtonClick={onCloseSpy} />
+        </Router>,
+      ),
+      onCloseSpy,
+    }
   }
 
   beforeEach(() => {
@@ -57,7 +58,7 @@ describe('Add Care Plan Modal', () => {
   })
 
   it('should call the on close function when the cancel button is clicked', async () => {
-    setup()
+    const { onCloseSpy } = setup()
     userEvent.click(
       screen.getByRole('button', {
         name: /close/i,
@@ -70,22 +71,20 @@ describe('Add Care Plan Modal', () => {
   it('should save care plan when the save button is clicked and close', async () => {
     const expectedCarePlan = {
       title: 'Feed Harry Potter',
-      description: 'Get Dobby to feed Harry Potter',
+      description: 'eat food',
       diagnosisId: '123', // condition
     }
 
-    setup()
+    const { onCloseSpy } = setup()
 
     const condition = screen.getAllByRole('combobox')[0]
     await selectEvent.select(condition, `too skinny`)
-    // const diagnosisId = screen.getAllByPlaceholderText('-- Choose --')[0] as HTMLInputElement
+
     const title = screen.getByPlaceholderText(/patient\.careplan\.title/i)
     const description = screen.getAllByRole('textbox')[1]
 
     userEvent.type(await title, expectedCarePlan.title)
     userEvent.type(await description, expectedCarePlan.description)
-
-    // selectEvent.select(screen.getByText(/patient\.carePlan\.condition/i), 'too skinny')
 
     await waitFor(() =>
       userEvent.click(
@@ -104,5 +103,6 @@ describe('Add Care Plan Modal', () => {
         carePlans: expect.arrayContaining([expect.objectContaining(expectedCarePlan)]),
       }),
     )
+    expect(onCloseSpy).toHaveBeenCalledTimes(1)
   })
 })
