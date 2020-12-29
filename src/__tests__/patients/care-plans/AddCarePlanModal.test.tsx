@@ -3,7 +3,6 @@ import userEvent from '@testing-library/user-event'
 import { createMemoryHistory } from 'history'
 import React from 'react'
 import { Router } from 'react-router-dom'
-import selectEvent from 'react-select-event'
 
 import AddCarePlanModal from '../../../patients/care-plans/AddCarePlanModal'
 import PatientRepository from '../../../shared/db/PatientRepository'
@@ -77,14 +76,14 @@ describe('Add Care Plan Modal', () => {
 
     const { onCloseSpy } = setup()
 
-    const condition = screen.getAllByRole('combobox')[0]
-    await selectEvent.select(condition, `too skinny`)
+    const diagnosisId = screen.getAllByPlaceholderText('-- Choose --')[0] as HTMLInputElement
+    userEvent.type(diagnosisId, `{arrowdown}{enter}`)
 
     const title = screen.getByPlaceholderText(/patient\.careplan\.title/i)
     const description = screen.getAllByRole('textbox')[1]
 
-    userEvent.type(await title, expectedCarePlan.title)
-    userEvent.type(await description, expectedCarePlan.description)
+    userEvent.type(title, expectedCarePlan.title)
+    userEvent.type(description, expectedCarePlan.description)
 
     await waitFor(() =>
       userEvent.click(
