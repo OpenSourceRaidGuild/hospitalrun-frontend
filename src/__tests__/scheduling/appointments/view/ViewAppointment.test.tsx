@@ -1,5 +1,5 @@
 import { Toaster } from '@hospitalrun/components'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import addMinutes from 'date-fns/addMinutes'
 import format from 'date-fns/format'
@@ -105,14 +105,12 @@ describe('View Appointment', () => {
   it('button toolbar empty if has only ReadAppointments permission', async () => {
     const { container } = setup()
 
-    await waitFor(() => {
-      expect(container.querySelector(`[class^='css-']`)).not.toBeInTheDocument()
-    })
+    await waitForElementToBeRemoved(() => container.querySelector(`[class^='css-']`))
 
     expect(screen.queryAllByRole('button')).toHaveLength(0)
   })
 
-  it('should call getAppointment by id if id is present', async () => {
+  it('should call getAppointment by id if id is present', () => {
     const { expectedAppointment } = setup()
 
     expect(AppointmentRepository.find).toHaveBeenCalledWith(expectedAppointment.id)
@@ -129,9 +127,11 @@ describe('View Appointment', () => {
   })
 
   it('should render an AppointmentDetailForm with the correct data', async () => {
-    const { expectedAppointment, expectedPatient } = setup()
+    const { expectedAppointment, expectedPatient, container } = setup()
 
-    const patientInput = await screen.findByDisplayValue(expectedPatient.fullName as string)
+    await waitForElementToBeRemoved(() => container.querySelector(`[class^='css-']`))
+
+    const patientInput = screen.getByDisplayValue(expectedPatient.fullName as string)
     expect(patientInput).toBeDisabled()
 
     const startDateInput = screen.getByDisplayValue(
@@ -151,6 +151,7 @@ describe('View Appointment', () => {
     const typeInput = screen.getByDisplayValue(
       `scheduling.appointment.types.${expectedAppointment.type}`,
     )
+
     expect(typeInput).toBeDisabled()
 
     const reasonInput = screen.getByDisplayValue(expectedAppointment.reason)
@@ -170,6 +171,7 @@ describe('View Appointment', () => {
     await waitFor(() => {
       expect(screen.getByText(/actions.confirmDelete/i)).toBeInTheDocument()
     })
+
     expect(
       screen.getByText(/scheduling\.appointment\.deleteConfirmationMessage/i),
     ).toBeInTheDocument()
@@ -178,8 +180,8 @@ describe('View Appointment', () => {
 
     await waitFor(() => {
       expect(AppointmentRepository.delete).toHaveBeenCalledTimes(1)
+      expect(AppointmentRepository.delete).toHaveBeenCalledWith(expectedAppointment)
     })
-    expect(AppointmentRepository.delete).toHaveBeenCalledWith(expectedAppointment)
 
     await waitFor(() => {
       expect(history.location.pathname).toEqual('/appointments')
