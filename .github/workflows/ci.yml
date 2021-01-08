@@ -10,7 +10,22 @@ on:
 
 
 jobs:
-  npm:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: Install with npm
+        run: |
+          npm install
+      - name: Lint code
+        run: |
+          npm run lint
+
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -26,12 +41,6 @@ jobs:
       - name: Install with npm
         run: |
           npm install
-      - name: Lint code
-        run: |
-          npm run lint
-      - name: Build
-        run: |
-          npm run build
       - name: Run tests
         run: |
           npm run coveralls
@@ -40,3 +49,23 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./coverage/lcov.info
+
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [14.x]
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+    steps:
+      - run: git config --global core.autocrlf false # this is needed to prevent git changing EOL after cloning on Windows OS
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install with npm
+        run: |
+          npm install
+      - name: Build
+        run: |
+          npm run build
