@@ -18,6 +18,11 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14.x
+      - name: NPM Cache
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-nodemodules-${{ hashFiles('**/node_modules/**/*') }}
       - name: Install with npm
         run: |
           npm install
