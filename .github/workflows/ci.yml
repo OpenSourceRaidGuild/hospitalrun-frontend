@@ -18,12 +18,14 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14.x
-      - name: NPM Cache
+      - name: Node Cache
+        id: node-cache
         uses: actions/cache@v2
         with:
           path: node_modules
-          key: ${{ runner.os }}-nodemodules-${{ hashFiles('**/node_modules/**/*') }}
+          key: ${{ runner.os }}-nodemodules-${{ hashFiles('package-lock.json') }}
       - name: Install with npm
+        if: steps.node-cache.outputs.cache-hit != 'true'
         run: |
           npm install
       - name: Lint code
@@ -43,7 +45,14 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Node Cache
+        id: node-cache
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ matrix.os }}-nodemodules-${{ hashFiles('package-lock.json') }}
       - name: Install with npm
+        if: steps.node-cache.outputs.cache-hit != 'true'
         run: |
           npm install
       - name: Run tests
@@ -68,7 +77,14 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Node Cache
+        id: node-cache
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ matrix.os }}-nodemodules-${{ hashFiles('package-lock.json') }}
       - name: Install with npm
+        if: steps.node-cache.outputs.cache-hit != 'true'
         run: |
           npm install
       - name: Build
